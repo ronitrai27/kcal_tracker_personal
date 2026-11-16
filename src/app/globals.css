@@ -1,26 +1,85 @@
 @import "tailwindcss";
 
+/* Only three colors: neon, white, black. Muted tones are black at lower opacity. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --neon: #e2f73b;
+  --white: #ffffff;
+  --ink: #0a0a0a;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-neon: var(--neon);
+  --color-ink: var(--ink);
+  --font-sans: var(--font-grotesk), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ink);
+  color: var(--ink);
+  font-family: var(--font-grotesk), system-ui, sans-serif;
+}
+
+@keyframes wiggle {
+  0% { transform: rotate(-14deg) scale(0.8); }
+  50% { transform: rotate(8deg) scale(1.08); }
+  100% { transform: rotate(0) scale(1); }
+}
+.wiggle { animation: wiggle 0.7s ease-out both; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.rise { animation: rise 0.5s ease-out both; }
+
+/* ---- onboarding step transitions ---- */
+@keyframes in-fwd { from { opacity: 0; transform: translateX(44px); } to { opacity: 1; transform: none; } }
+@keyframes in-back { from { opacity: 0; transform: translateX(-44px); } to { opacity: 1; transform: none; } }
+@keyframes out-fwd { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(-44px); } }
+@keyframes out-back { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(44px); } }
+.step-in-fwd { animation: in-fwd 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.step-in-back { animation: in-back 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.step-out-fwd { animation: out-fwd 0.2s ease-in both; }
+.step-out-back { animation: out-back 0.2s ease-in both; }
+
+/* children of .stagger pop in one after another */
+.stagger > * { animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.stagger > *:nth-child(2) { animation-delay: 0.06s; }
+.stagger > *:nth-child(3) { animation-delay: 0.12s; }
+.stagger > *:nth-child(4) { animation-delay: 0.18s; }
+.stagger > *:nth-child(5) { animation-delay: 0.24s; }
+.stagger > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger > *:nth-child(7) { animation-delay: 0.36s; }
+
+@keyframes pop { 0% { transform: scale(0.94); } 60% { transform: scale(1.04); } 100% { transform: scale(1); } }
+.pop { animation: pop 0.3s ease-out; }
+
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.shimmer {
+  background: linear-gradient(90deg, rgba(10,10,10,0.06) 25%, rgba(226,247,59,0.55) 50%, rgba(10,10,10,0.06) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes orb { 0%, 100% { transform: scale(1) rotate(0); border-radius: 42% 58% 55% 45%; } 50% { transform: scale(1.18) rotate(90deg); border-radius: 58% 42% 45% 55%; } }
+.orb { animation: orb 2.4s ease-in-out infinite; }
+
+@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.draw { stroke-dasharray: 1; animation: draw 0.9s ease-out both; }
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* neon range slider */
+input[type="range"].range { -webkit-appearance: none; appearance: none; width: 100%; height: 12px; border-radius: 999px; background: rgba(10,10,10,0.1); outline: none; }
+input[type="range"].range::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; border-radius: 50%; background: var(--neon); border: 3px solid var(--ink); cursor: grab; }
+input[type="range"].range::-moz-range-thumb { width: 28px; height: 28px; border-radius: 50%; background: var(--neon); border: 3px solid var(--ink); cursor: grab; }
+
+@media (prefers-reduced-motion: reduce) {
+  .step-in-fwd, .step-in-back, .step-out-fwd, .step-out-back, .stagger > *, .rise, .wiggle, .pop, .orb, .draw { animation: none !important; }
 }
